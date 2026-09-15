@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Switch to postgres by changing provider to "postgresql"
+// and setting DATABASE_URL to a postgres URL. Schema is compatible.
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @default("Admin")
+  role         String   @default("superadmin") // superadmin | editor
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  seoTitle    String?
+  seoDesc     String?
+  content     String   @default("")
+  status      String   @default("published") // draft | published | archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  @@index([slug, status])
+}
+
+model Feature {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  icon        String  @default("book")
+  order       Int     @default(0)
+  enabled     Boolean @default(true)
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @default("")
+  icon        String   @default("book")
+  color       String   @default("#1557C0")
+  order       Int      @default(0)
+  featured    Boolean  @default(false)
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @default("")
+  content     String   @default("")
+  author      String   @default("Doctology Team")
+  category    String   @default("Study Guide")
+  subjectSlug String? 
+  image       String?
+  readingTime Int      @default(5)
+  status      String   @default("published") // draft | published | archived
+  seoTitle    String?
+  seoDesc     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  @@index([status, category])
+  @@index([slug])
+}
+
+model Faq {
+  id        String  @id @default(cuid())
+  question  String
+  answer    String
+  category  String  @default("General")
+  order     Int     @default(0)
+  published Boolean @default(true)
+}
+
+model PricingPlan {
+  id          String  @id @default(cuid())
+  name        String
+  price       String  @default("Coming soon")
+  interval    String  @default("")
+  description String  @default("")
+  features    String  @default("[]") // JSON array string
+  cta         String  @default("Get Started")
+  highlighted Boolean @default(false)
+  badge       String?
+  ordering    Int     @default(0)
+  enabled     Boolean @default(true)
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @default("")
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  alt       String   @default("")
+  mime      String   @default("")
+  size      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String   @default("")
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
